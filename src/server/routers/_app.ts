@@ -1,7 +1,5 @@
 import { z } from "zod";
 import { connect } from "@tidbcloud/serverless";
-import { ollama } from "ollama-ai-provider";
-import { generateText, streamText } from "ai";
 import { procedure, router } from "../trpc";
 
 export const appRouter = router({
@@ -43,23 +41,6 @@ export const appRouter = router({
           data: null,
           error: (e as Error).message,
         };
-      }
-    }),
-
-  testLLM: procedure
-    .input(
-      z.object({
-        prompt: z.string(),
-      }),
-    )
-    .mutation(async function* (opts) {
-      const result = await streamText({
-        model: ollama("llama3.2"),
-        prompt: opts.input.prompt,
-      });
-
-      for await (const chunk of result.textStream) {
-        yield chunk;
       }
     }),
 });

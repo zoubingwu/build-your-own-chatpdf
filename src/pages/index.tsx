@@ -3,6 +3,8 @@ import { trpc } from "@/utils/trpc";
 import { useState } from "react";
 import { useLocalStorage } from "react-use";
 import clsx from "clsx";
+import { ollama } from "ollama-ai-provider";
+import { embed, streamText } from "ai";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -15,11 +17,30 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+function useChat() {
+  const [chatResult, setChatResult] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+
+  const ask = async (prompt: string) => {
+    setChatResult("");
+    setLoading(true);
+    const result = await streamText({
+      model: ollama("llama3.2"),
+      prompt,
+    });
+    setLoading(false);
+    for await (const chunk of result.textStream) {
+      setChatResult((prev) => prev + chunk);
+    }
+  };
+
+  return { result: chatResult, ask, isPending: loading };
+}
+
 function Prepare({ onNext }: { onNext: () => void }) {
-  const [testLLMResult, setTestLLMResult] = useState<string>("");
   const [conn, setConn] = useLocalStorage("conn", "");
   const testConnection = trpc.testConnection.useMutation();
-  const testLLM = trpc.testLLM.useMutation();
+  const { result, ask, isPending } = useChat();
 
   const onTestConnection = () => {
     if (testConnection.isPending) return;
@@ -27,20 +48,14 @@ function Prepare({ onNext }: { onNext: () => void }) {
   };
 
   const onTestLLM = async () => {
-    setTestLLMResult("");
-    const result = await testLLM.mutateAsync({ prompt: "Hello, world!" });
-    for await (const chunk of result) {
-      setTestLLMResult((prev) => prev + chunk);
-    }
+    await ask("Hello, world!");
   };
 
   return (
     <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start lg:max-w-2xl">
-      <h1 className="text-2xl font-bold font-[family-name:var(--font-geist-mono)]">
-        Build your own chatPDF
-      </h1>
+      <h1 className="text-2xl font-bold">Build your own chatPDF</h1>
       <form>
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
+        <ol className="list-inside list-decimal text-sm text-center sm:text-left">
           <li className="mb-4">
             <span>
               {" "}
@@ -138,7 +153,8 @@ function Prepare({ onNext }: { onNext: () => void }) {
             >
               Say hello to ollama
             </button>
-            <div>{testLLMResult}</div>
+            {isPending && <div>Loading...</div>}
+            <div>{result}</div>
           </li>
         </ol>
 
@@ -154,11 +170,48 @@ function Embedding({
   onNext,
   onPrev,
 }: { onNext: () => void; onPrev: () => void }) {
+  const [embedding, setEmbedding] = useState<number[] | null>(null);
+
+  const onTestEmbedding = async () => {
+    const result = await embed({
+      model: ollama.textEmbeddingModel("nomic-embed-text"),
+      value: "Dog",
+    });
+    setEmbedding(result.embedding);
+  };
+
   return (
-    <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-      <h1 className="text-2xl font-bold font-[family-name:var(--font-geist-mono)]">
-        Embedding
-      </h1>
+    <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start lg:max-w-2xl">
+      <h1 className="text-2xl font-bold">Embedding</h1>
+      <div className="flex flex-col gap-2 text-sm">
+        <p>
+          Text embedding is a technique to convert text into numerical vectors
+          (arrays of numbers) that capture the semantic meaning of the text.
+        </p>
+
+        <p>For example, we can ask ollama to embed the text "Dog":</p>
+
+        <div>
+          <button
+            className="btn btn-secondary btn-sm"
+            type="button"
+            onClick={onTestEmbedding}
+          >
+            try embedding "Dog"
+          </button>
+        </div>
+
+        {embedding && (
+          <>
+            <p className="truncate max-w-2xl">{JSON.stringify(embedding)}</p>
+            <p>
+              This embedding is a {embedding.length}-dimensional vector (an
+              array of {embedding.length} numbers) that represents the semantic
+              meaning of the text "Dog".
+            </p>
+          </>
+        )}
+      </div>
 
       <div className="flex gap-2">
         <button className="btn btn-secondary" type="button" onClick={onPrev}>
@@ -178,9 +231,7 @@ function VectorSearch({
 }: { onNext: () => void; onPrev: () => void }) {
   return (
     <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start lg:max-w-2xl">
-      <h1 className="text-2xl font-bold font-[family-name:var(--font-geist-mono)]">
-        Vector Search
-      </h1>
+      <h1 className="text-2xl font-bold">Vector Search</h1>
 
       <div className="flex gap-2">
         <button className="btn btn-secondary" type="button" onClick={onPrev}>
@@ -200,9 +251,7 @@ function Reranking({
 }: { onNext: () => void; onPrev: () => void }) {
   return (
     <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start lg:max-w-2xl">
-      <h1 className="text-2xl font-bold font-[family-name:var(--font-geist-mono)]">
-        Reranking
-      </h1>
+      <h1 className="text-2xl font-bold">Reranking</h1>
 
       <div className="flex gap-2">
         <button className="btn btn-secondary" type="button" onClick={onPrev}>
@@ -222,9 +271,7 @@ function ChatWithAI({
 }: { onNext: () => void; onPrev: () => void }) {
   return (
     <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start lg:max-w-2xl">
-      <h1 className="text-2xl font-bold font-[family-name:var(--font-geist-mono)]">
-        Chat with AI
-      </h1>
+      <h1 className="text-2xl font-bold">Chat with AI</h1>
 
       <div className="flex gap-2">
         <button className="btn btn-secondary" type="button" onClick={onPrev}>
@@ -255,7 +302,7 @@ export default function Home() {
 
   return (
     <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
+      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-mono)]`}
     >
       <ul className="steps">
         {[
