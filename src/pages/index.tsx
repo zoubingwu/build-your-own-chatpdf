@@ -835,10 +835,13 @@ function Ch6({ onPrev }: { onPrev: () => void }) {
     "What is the max dimension that TiDB Vector supported?",
   );
   const { result, ask, isPending } = useChat();
-  const { result: ragResult, ask: askRag, isPending: ragPending } = useChat();
+  const { result: ragResult, ask: askRag, isPending: isRagPending } = useChat();
+  const [ragPending, setRagPending] = useState(false);
 
   const askWithRag = async (query: string) => {
     try {
+      setRagPending(true);
+
       // First get relevant docs
       const docs = await queryDocuments.mutateAsync({
         query,
@@ -860,12 +863,13 @@ function Ch6({ onPrev }: { onPrev: () => void }) {
         .map((d) => d.document.text)
         .join("\n\n");
 
-      // Ask LLM with context
       const prompt = `Based on following context, answer the question: ${query}\n\nContext: ${context}`;
 
-      await askRag(prompt);
+      askRag(prompt);
     } catch (e) {
       alert(e);
+    } finally {
+      setRagPending(false);
     }
   };
 
@@ -949,16 +953,17 @@ function Ch6({ onPrev }: { onPrev: () => void }) {
           </button>
         </div>
 
-        {isPending && <div>Loading...</div>}
         {(result || ragResult) && (
           <div className="flex gap-2 w-full text-sm">
             <div className="w-1/2">
               <h3>Direct</h3>
-              <Markdown>{result}</Markdown>
+              <Markdown>{isPending ? "Loading..." : result}</Markdown>
             </div>
             <div className="w-1/2">
               <h3>With RAG</h3>
-              <Markdown>{ragResult}</Markdown>
+              <Markdown>
+                {ragPending || isRagPending ? "Loading..." : ragResult}
+              </Markdown>
             </div>
           </div>
         )}
