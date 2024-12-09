@@ -1,10 +1,10 @@
 import localFont from "next/font/local";
 import { trpc } from "@/utils/trpc";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocalStorage } from "react-use";
 import clsx from "clsx";
 import { ollama } from "ollama-ai-provider";
-import { embed, streamText } from "ai";
+import { streamText } from "ai";
 import { Highlight, themes } from "prism-react-renderer";
 import Markdown from "react-markdown";
 
@@ -27,7 +27,7 @@ function useChat() {
     setChatResult("");
     setLoading(true);
     const result = await streamText({
-      model: ollama("llama3.1:8b"),
+      model: ollama("llama3.2"),
       prompt,
     });
     setLoading(false);
@@ -93,6 +93,7 @@ function Ch1({ onNext }: { onNext: () => void }) {
   const [conn, setConn] = useLocalStorage("conn", "");
   const testConnection = trpc.testConnection.useMutation();
   const { result, ask, isPending } = useChat();
+  const [origin, setOrigin] = useState("");
 
   const onTestConnection = () => {
     if (testConnection.isPending) return;
@@ -102,6 +103,10 @@ function Ch1({ onNext }: { onNext: () => void }) {
   const onTestLLM = async () => {
     await ask("Hello, world!");
   };
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   return (
     <Section>
@@ -198,21 +203,28 @@ function Ch1({ onNext }: { onNext: () => void }) {
                   <code># install ollama and start the server</code>
                 </pre>
                 <pre data-prefix="$">
-                  <code>brew install ollama && ollama serve</code>
-                </pre>
-                <pre></pre>
-                <pre data-prefix="" className="text-info-content">
-                  <code># open another terminal window</code>
+                  <code>brew install ollama</code>
                 </pre>
                 <pre data-prefix="$">
-                  <code>ollama run llama3.2</code>
+                  <code>ollama pull llama3.2</code>
+                </pre>
+                <pre data-prefix="$">
+                  <code>export OLLAMA_HOST={origin} && ollama serve</code>
                 </pre>
               </div>
             </span>
 
             <span>
               Now you have ollama running on your local machine on port 11434!
+              Then open another terminal window and run{" "}
+              <code className="bg-neutral text-white rounded-md p-1">
+                ollama run llama3.2
+              </code>{" "}
+              to download the llama3.2 model. This is a 3B model that takes
+              around 2GB of space to download.
             </span>
+
+            <br />
 
             <button
               className="btn btn-secondary btn-sm my-2"
