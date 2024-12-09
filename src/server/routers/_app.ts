@@ -197,6 +197,8 @@ export const appRouter = router({
       const embeddingsData =
         (await embeddingsResult.json()) as JinaEmbeddingsResponse;
 
+      console.log(embeddingsData);
+
       const queryEmbedding = embeddingsData.data[0].embedding;
 
       const result = await conn.execute(
