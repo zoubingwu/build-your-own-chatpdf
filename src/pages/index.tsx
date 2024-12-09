@@ -861,7 +861,7 @@ function Ch6({ onPrev }: { onPrev: () => void }) {
         .join("\n\n");
 
       // Ask LLM with context
-      const prompt = `Based on following context, what are TiDB Vector Search limitations?\n\nContext: ${context}`;
+      const prompt = `Based on following context, answer the question: ${query}\n\nContext: ${context}`;
 
       await askRag(prompt);
     } catch (e) {
