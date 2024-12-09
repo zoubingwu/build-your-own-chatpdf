@@ -206,9 +206,6 @@ function Ch1({ onNext }: { onNext: () => void }) {
                   <code>brew install ollama</code>
                 </pre>
                 <pre data-prefix="$">
-                  <code>ollama pull llama3.2</code>
-                </pre>
-                <pre data-prefix="$">
                   <code>export OLLAMA_HOST={origin} && ollama serve</code>
                 </pre>
               </div>
