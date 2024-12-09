@@ -109,16 +109,15 @@ function Ch1({ onNext }: { onNext: () => void }) {
       <form className="flex flex-col gap-4">
         <p>
           You may have heard of <i>Retrieval Augmented Generation or RAG</i>{" "}
-          frequently if you are a developer who worked with generative AI.
+          frequently if you're a developer working with generative AI.
         </p>
 
         <p>
-          In one word, the essence of RAG is about sending your own data (via a
-          retrieval tool) as a part of the prompt to the large language model.
-          As a result, so you get a output that is more accurate and relevant to
-          your data. This technique gives you benefits like avoiding
-          hallucinations and helping fact-check the output even the data is not
-          in the LLM's training datasets.
+          In simple terms, RAG is about sending your own data (via a retrieval
+          tool) as part of the prompt to the large language model. As a result,
+          you get output that is more accurate and relevant to your data. This
+          technique helps avoid hallucinations and fact-checks the output even
+          when the data isn't in the LLM's training datasets.
         </p>
 
         <p>
@@ -261,16 +260,16 @@ function Ch2({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
         </p>
 
         <p>
-          The <b>indexing</b> step is about converting your data into embeddings
-          and storing them with some metadata.
+          The <b>indexing</b> step involves converting your data into embeddings
+          and storing them with metadata.
         </p>
 
         <p>
-          When user gives a query, which is the <b>querying</b> step, we will
-          turn the query into an embedding and compare it with all the
-          embeddings we saved, then find the most semantically similar ones and
-          retrieve the corresponding content, so we can pass them to the LLM
-          along with the user's query.
+          During the <b>querying</b> step, when a user submits a query, we
+          convert it into an embedding and compare it with all the stored
+          embeddings to find the most semantically similar ones. We then
+          retrieve the corresponding content and pass it to the LLM along with
+          the user's query.
         </p>
 
         <p>
@@ -356,7 +355,7 @@ function Ch3({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
         <p>
           Like we mentioned before, indexing is the process of converting your
           documents into searchable embeddings and storing them in a database.
-          Think of it like creating a smart library catalog where each piece of
+          Think of it as creating a smart library catalog where each piece of
           content is transformed into a numerical format that computers can
           easily search through.
         </p>
@@ -657,10 +656,10 @@ function Ch5({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
 
       <div className="flex flex-col gap-2">
         <p>
-          So far, we have learned how to index and query documents using TiDB
+          So far, we've learned how to index and query documents using TiDB
           Vector Search. However, the results may not always be accurate. For
           example, if we ask "What is TiDB Vector Search's limitation?", the
-          results may include some unrelated content.
+          results might include some unrelated content.
         </p>
 
         <p>
@@ -903,8 +902,8 @@ function Ch6({ onPrev }: { onPrev: () => void }) {
             capture meaning
           </li>
           <li>
-            We built an indexing pipeline using Reader API to get content,
-            Segmenter API to chunk it, and stored embeddings in TiDB
+            We built an indexing pipeline using the Reader API to get content,
+            the Segmenter API to chunk it, and stored embeddings in TiDB
           </li>
           <li>
             We implemented vector search to find relevant content using cosine
