@@ -181,7 +181,7 @@ function Ch1({ onNext }: { onNext: () => void }) {
 
           <li>
             <span>
-              Setup{" "}
+              Optionally, you can setup{" "}
               <a
                 href="https://ollama.com"
                 target="_blank"
@@ -189,10 +189,10 @@ function Ch1({ onNext }: { onNext: () => void }) {
                 className="underline"
               >
                 ollama
-              </a>
-              , this runs the LLM for text generation and text embeddings on
-              your local machine. For example if you are on a mac, you can just
-              run following commands in your terminal:
+              </a>{" "}
+              on your local machine. This runs the LLM for text generation with
+              your own computation for free. For example if you are on a mac,
+              you can just run following commands in your terminal:
               <div className="mockup-code my-2">
                 <pre data-prefix="" className="text-info-content">
                   <code># install ollama and start the server</code>
@@ -203,9 +203,6 @@ function Ch1({ onNext }: { onNext: () => void }) {
                 <pre></pre>
                 <pre data-prefix="" className="text-info-content">
                   <code># open another terminal window</code>
-                </pre>
-                <pre data-prefix="$">
-                  <code>ollama pull nomic-embed-text</code>
                 </pre>
                 <pre data-prefix="$">
                   <code>ollama run llama3.2</code>
@@ -221,6 +218,7 @@ function Ch1({ onNext }: { onNext: () => void }) {
               className="btn btn-secondary btn-sm my-2"
               type="button"
               onClick={onTestLLM}
+              disabled={isPending}
             >
               Say hello to ollama
             </button>
@@ -240,16 +238,6 @@ function Ch1({ onNext }: { onNext: () => void }) {
 }
 
 function Ch2({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
-  const [embedding, setEmbedding] = useState<number[] | null>(null);
-
-  const onTestEmbedding = async () => {
-    const result = await embed({
-      model: ollama.textEmbeddingModel("nomic-embed-text"),
-      value: "Dog",
-    });
-    setEmbedding(result.embedding);
-  };
-
   return (
     <Section>
       <h2 className="text-xl font-bold">Embedding</h2>
@@ -277,28 +265,18 @@ function Ch2({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
           (arrays of numbers) that capture the semantic meaning of the text.
         </p>
 
-        <p>For example, we can ask ollama to embed the text "Dog":</p>
+        <p>
+          For example, the word "Dog" can be turned into an embedding like this:
+        </p>
 
-        <div>
-          <button
-            className="btn btn-secondary btn-sm"
-            type="button"
-            onClick={onTestEmbedding}
-          >
-            Turn "Dog" into an embedding
-          </button>
-        </div>
+        <p className="truncate max-w-2xl">
+          [0.0028247838,-0.011423655,-0.16130109,-0.04331225,0.046027105,0.0588...
+        </p>
 
-        {embedding && (
-          <>
-            <p className="truncate max-w-2xl">{JSON.stringify(embedding)}</p>
-            <p>
-              This embedding is a {embedding.length}-dimensional vector (an
-              array of {embedding.length} numbers) that represents the semantic
-              meaning of the word "Dog".
-            </p>
-          </>
-        )}
+        <p>
+          This embedding is a 768-dimensional vector (an array of 768 numbers)
+          that represents the semantic meaning of the word "Dog".
+        </p>
 
         <p>
           Just like calculating the distance between two points in a 2D or 3D
@@ -551,7 +529,7 @@ function Ch4({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
           </li>
 
           <li>
-            We can do this using a special command in TiDB called
+            We can do this using a special function in TiDB called
             "vec_cosine_distance". It helps us find the closest matches, like
             this:
           </li>
@@ -963,16 +941,18 @@ function Ch6({ onPrev }: { onPrev: () => void }) {
         </div>
 
         {isPending && <div>Loading...</div>}
-        <div className="flex gap-2 w-full text-sm">
-          <div className="w-1/2">
-            <h3>Direct</h3>
-            <Markdown>{result}</Markdown>
+        {(result || ragResult) && (
+          <div className="flex gap-2 w-full text-sm">
+            <div className="w-1/2">
+              <h3>Direct</h3>
+              <Markdown>{result}</Markdown>
+            </div>
+            <div className="w-1/2">
+              <h3>With RAG</h3>
+              <Markdown>{ragResult}</Markdown>
+            </div>
           </div>
-          <div className="w-1/2">
-            <h3>With RAG</h3>
-            <Markdown>{ragResult}</Markdown>
-          </div>
-        </div>
+        )}
       </div>
 
       <div className="flex gap-2 mt-8">
