@@ -145,8 +145,8 @@ function Ch1({ onNext }: { onNext: () => void }) {
                 TiDB Cloud
               </a>{" "}
               to create a TiDB Serverless cluster and get the connection string.
-              This will be used to store all the embeddings and run vector
-              search.
+              TiDB Cloud provides a free database with vector search
+              capabilities so we can use it to store all the embeddings.
             </span>
             <label className="input input-bordered flex items-center gap-2 mt-2">
               <input
@@ -953,20 +953,18 @@ function Ch6({ onPrev }: { onPrev: () => void }) {
           </button>
         </div>
 
-        {(result || ragResult) && (
-          <div className="flex gap-2 w-full text-sm">
-            <div className="w-1/2">
-              <h3>Direct</h3>
-              <Markdown>{isPending ? "Loading..." : result}</Markdown>
-            </div>
-            <div className="w-1/2">
-              <h3>With RAG</h3>
-              <Markdown>
-                {ragPending || isRagPending ? "Loading..." : ragResult}
-              </Markdown>
-            </div>
+        <div className="flex gap-2 w-full text-sm">
+          <div className="w-1/2">
+            <h3>Direct</h3>
+            <Markdown>{isPending ? "Loading..." : result}</Markdown>
           </div>
-        )}
+          <div className="w-1/2">
+            <h3>With RAG</h3>
+            <Markdown>
+              {ragPending || isRagPending ? "Loading..." : ragResult}
+            </Markdown>
+          </div>
+        </div>
       </div>
 
       <div className="flex gap-2 mt-8">
@@ -1052,7 +1050,9 @@ export default function Home() {
       </aside>
 
       <article className="min-w-[670px]">
-        <h1 className="text-2xl font-bold mb-8">How to build your own RAG</h1>
+        <h1 className="text-2xl font-bold mb-8">
+          How to build a RAG app with TiDB Vector Search
+        </h1>
         {content}
       </article>
     </div>
